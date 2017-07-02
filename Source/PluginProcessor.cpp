@@ -25,6 +25,12 @@ BackwardsAudioProcessor::BackwardsAudioProcessor()
                        )
 #endif
 {
+    userParameters.insert(std::make_pair(ControlParameter::RoomSize, 0.0f));
+    userParameters.insert(std::make_pair(ControlParameter::Liveness, 0.0f));
+    userParameters.insert(std::make_pair(ControlParameter::Delay, 0.0f));
+    userParameters.insert(std::make_pair(ControlParameter::LPF, 0.0f));
+    userParameters.insert(std::make_pair(ControlParameter::OutputLevel, 0.7f));
+    userParameters.insert(std::make_pair(ControlParameter::MixBalance, 0.0f));
 }
 
 BackwardsAudioProcessor::~BackwardsAudioProcessor()
@@ -168,6 +174,50 @@ void BackwardsAudioProcessor::setStateInformation (const void* data, int sizeInB
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+}
+
+//==============================================================================
+int BackwardsAudioProcessor::getNumParameters()
+{
+    return static_cast<int>(ControlParameter::totalNum);
+}
+
+float BackwardsAudioProcessor::getParameter(int index)
+{
+    auto parameterIterator = userParameters.find(static_cast<ControlParameter>(index));
+    if (parameterIterator == userParameters.end()) return 0;
+    return parameterIterator->second;
+}
+
+void BackwardsAudioProcessor::setParameter(int index, float value)
+{
+    const ControlParameter& controlParameterIndex = static_cast<ControlParameter>(index);
+    auto parameterIterator = userParameters.find(controlParameterIndex);
+    if (parameterIterator == userParameters.end()) return;
+
+    auto& parameterValue = parameterIterator->second;
+    parameterValue = value;
+}
+
+const String BackwardsAudioProcessor::getParameterName(int index)
+{
+    const ControlParameter& controlParameterIndex = static_cast<ControlParameter>(index);
+    return controlParameterIndex == ControlParameter::RoomSize ? "ROOMSIZE"
+        : controlParameterIndex == ControlParameter::Liveness ? "LIVENESS"
+        : controlParameterIndex == ControlParameter::Delay ? "DELAY"
+        : controlParameterIndex == ControlParameter::LPF ? "LPF"
+        : controlParameterIndex == ControlParameter::OutputLevel ? "OUT LVL"
+        : controlParameterIndex == ControlParameter::MixBalance ? "MIX BAL"
+        : String::empty;
+}
+
+const String BackwardsAudioProcessor::getParameterText(int index)
+{
+    const ControlParameter& controlParameterIndex = static_cast<ControlParameter>(index);
+    auto parameterIterator = userParameters.find(controlParameterIndex);
+    if (parameterIterator == userParameters.end()) return String();
+
+    return String(parameterIterator->second);
 }
 
 //==============================================================================

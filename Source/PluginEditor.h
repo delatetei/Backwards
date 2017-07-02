@@ -17,7 +17,8 @@
 //==============================================================================
 /**
 */
-class BackwardsAudioProcessorEditor  : public AudioProcessorEditor
+class BackwardsAudioProcessorEditor
+    : public AudioProcessorEditor, private Slider::Listener, private Timer
 {
 public:
     BackwardsAudioProcessorEditor (BackwardsAudioProcessor&);
@@ -31,6 +32,10 @@ private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     BackwardsAudioProcessor& processor;
+
+    //==============================================================================
+    void sliderValueChanged(Slider *changedSlider) override;
+    void timerCallback() override;
 
     //==============================================================================
     const int WINDOW_HEIGHT = 200;

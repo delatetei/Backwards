@@ -71,6 +71,15 @@ BackwardsAudioProcessorEditor::BackwardsAudioProcessorEditor (BackwardsAudioProc
     addAndMakeVisible(&mixBalance);
     addAndMakeVisible(&mixBalanceLabel);
 
+    roomSize.addListener(this);
+    liveness.addListener(this);
+    delay.addListener(this);
+    lowpassFilter.addListener(this);
+    outputLevel.addListener(this);
+    mixBalance.addListener(this);
+
+    startTimer(30);
+
 }
 
 BackwardsAudioProcessorEditor::~BackwardsAudioProcessorEditor()
@@ -114,4 +123,42 @@ void BackwardsAudioProcessorEditor::resized()
     outputLevel.setBounds(outputLevelArea.removeFromLeft(WINDOW_WIDTH - LABEL_WIDTH));
     mixBalanceLabel.setBounds(mixBalanceArea.removeFromLeft(LABEL_WIDTH));
     mixBalance.setBounds(mixBalanceArea.removeFromLeft(WINDOW_WIDTH - LABEL_WIDTH));
+}
+
+void BackwardsAudioProcessorEditor::sliderValueChanged(Slider * changedSlider)
+{
+    if (changedSlider == &roomSize)
+    {
+        processor.setParameterNotifyingHost(static_cast<int>(ControlParameter::RoomSize), static_cast<float>(roomSize.getValue()));
+    }
+    else if (changedSlider == &liveness)
+    {
+        processor.setParameterNotifyingHost(static_cast<int>(ControlParameter::Liveness), static_cast<float>(liveness.getValue()));
+    }
+    else if (changedSlider == &delay)
+    {
+        processor.setParameterNotifyingHost(static_cast<int>(ControlParameter::Delay), static_cast<float>(delay.getValue()));
+    }
+    else if (changedSlider == &lowpassFilter)
+    {
+        processor.setParameterNotifyingHost(static_cast<int>(ControlParameter::LPF), static_cast<float>(lowpassFilter.getValue()));
+    }
+    else if (changedSlider == &outputLevel)
+    {
+        processor.setParameterNotifyingHost(static_cast<int>(ControlParameter::OutputLevel), static_cast<float>(outputLevel.getValue()));
+    }
+    else if (changedSlider == &mixBalance)
+    {
+        processor.setParameterNotifyingHost(static_cast<int>(ControlParameter::MixBalance), static_cast<float>(mixBalance.getValue()));
+    }
+}
+
+void BackwardsAudioProcessorEditor::timerCallback()
+{
+    roomSize.setValue(processor.getParameter(static_cast<int>(ControlParameter::RoomSize)), dontSendNotification);
+    liveness.setValue(processor.getParameter(static_cast<int>(ControlParameter::Liveness)), dontSendNotification);
+    delay.setValue(processor.getParameter(static_cast<int>(ControlParameter::Delay)), dontSendNotification);
+    lowpassFilter.setValue(processor.getParameter(static_cast<int>(ControlParameter::LPF)), dontSendNotification);
+    outputLevel.setValue(processor.getParameter(static_cast<int>(ControlParameter::OutputLevel)), dontSendNotification);
+    mixBalance.setValue(processor.getParameter(static_cast<int>(ControlParameter::MixBalance)), dontSendNotification);
 }

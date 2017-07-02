@@ -11,7 +11,8 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
-
+#include <map>
+#include "Const/ControlParameter.h"
 
 //==============================================================================
 /**
@@ -55,7 +56,15 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    //==============================================================================
+    int getNumParameters() override;
+    float getParameter(int index) override;
+    void setParameter(int index, float value) override;
+    const String getParameterName(int index) override;
+    const String getParameterText(int index) override;
 private:
     //==============================================================================
+    std::map<ControlParameter, float> userParameters;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BackwardsAudioProcessor)
 };
