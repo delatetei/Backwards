@@ -32,5 +32,29 @@ private:
     // access the processor object that created it.
     BackwardsAudioProcessor& processor;
 
+    //==============================================================================
+    const int WINDOW_HEIGHT = 200;
+    const int WINDOW_WIDTH = 400;
+    const int HEADER_HEIGHT = 50;
+    const int ITEM_HEIGHT= 24;
+    const int LABEL_WIDTH= 100;
+
+    //==============================================================================
+    Label title;
+
+    //==============================================================================
+    Slider roomSize;
+    Slider liveness;
+    Slider delay;
+    Slider lowpassFilter;
+    Slider outputLevel;
+    Slider mixBalance;
+    Label roomSizeLabel;
+    Label livenessLabel;
+    Label delayLabel;
+    Label lowpassFilterLabel;
+    Label outputLevelLabel;
+    Label mixBalanceLabel;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BackwardsAudioProcessorEditor)
 };
