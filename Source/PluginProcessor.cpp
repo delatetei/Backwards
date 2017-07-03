@@ -168,12 +168,61 @@ void BackwardsAudioProcessor::getStateInformation (MemoryBlock& destData)
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
+    XmlElement root("Root");
+    XmlElement *el;
+    el = root.createNewChildElement("RoomSize");
+    el->addTextElement(String(userParameters[ControlParameter::RoomSize]));
+    el = root.createNewChildElement("Liveness");
+    el->addTextElement(String(userParameters[ControlParameter::Liveness]));
+    el = root.createNewChildElement("Delay");
+    el->addTextElement(String(userParameters[ControlParameter::Delay]));
+    el = root.createNewChildElement("LPF");
+    el->addTextElement(String(userParameters[ControlParameter::LPF]));
+    el = root.createNewChildElement("OutputLevel");
+    el->addTextElement(String(userParameters[ControlParameter::OutputLevel]));
+    el = root.createNewChildElement("MixBalance");
+    el->addTextElement(String(userParameters[ControlParameter::MixBalance]));
+    copyXmlToBinary(root, destData);
+
 }
 
 void BackwardsAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+    XmlElement* pRoot = getXmlFromBinary(data, sizeInBytes);
+    if (pRoot != nullptr)
+    {
+        forEachXmlChildElement((*pRoot), pChild)
+        {
+            String text = pChild->getAllSubText();
+            if (pChild->hasTagName("RoomSize"))
+            {
+                setParameter(static_cast<int>(ControlParameter::RoomSize), text.getFloatValue());
+            }
+            else if (pChild->hasTagName("Liveness"))
+            {
+                setParameter(static_cast<int>(ControlParameter::Liveness), text.getFloatValue());
+            }
+            else if (pChild->hasTagName("Delay"))
+            {
+                setParameter(static_cast<int>(ControlParameter::Delay), text.getFloatValue());
+            }
+            else if (pChild->hasTagName("LPF"))
+            {
+                setParameter(static_cast<int>(ControlParameter::LPF), text.getFloatValue());
+            }
+            else if (pChild->hasTagName("OutputLevel"))
+            {
+                setParameter(static_cast<int>(ControlParameter::OutputLevel), text.getFloatValue());
+            }
+            else if (pChild->hasTagName("MixBalance"))
+            {
+                setParameter(static_cast<int>(ControlParameter::MixBalance), text.getFloatValue());
+            }
+        }
+        delete pRoot;
+    }
 }
 
 //==============================================================================
