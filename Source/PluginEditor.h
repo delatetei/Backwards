@@ -18,10 +18,10 @@
 /**
 */
 class BackwardsAudioProcessorEditor
-    : public AudioProcessorEditor, private Slider::Listener, private Timer
+    : public AudioProcessorEditor
 {
 public:
-    BackwardsAudioProcessorEditor (BackwardsAudioProcessor&);
+    BackwardsAudioProcessorEditor (BackwardsAudioProcessor&, AudioProcessorValueTreeState&);
     ~BackwardsAudioProcessorEditor();
 
     //==============================================================================
@@ -32,10 +32,7 @@ private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     BackwardsAudioProcessor& processor;
-
-    //==============================================================================
-    void sliderValueChanged(Slider *changedSlider) override;
-    void timerCallback() override;
+    AudioProcessorValueTreeState& valueTreeState;
 
     //==============================================================================
     const int WINDOW_HEIGHT = 200;
@@ -60,6 +57,14 @@ private:
     Label lowpassFilterLabel;
     Label outputLevelLabel;
     Label mixBalanceLabel;
+
+    //==============================================================================
+    ScopedPointer<AudioProcessorValueTreeState::SliderAttachment> roomSizeAttachment;
+    ScopedPointer<AudioProcessorValueTreeState::SliderAttachment> livenessAttachment;
+    ScopedPointer<AudioProcessorValueTreeState::SliderAttachment> delayAttachment;
+    ScopedPointer<AudioProcessorValueTreeState::SliderAttachment> lowpassFilterAttachment;
+    ScopedPointer<AudioProcessorValueTreeState::SliderAttachment> outputLevelAttachment;
+    ScopedPointer<AudioProcessorValueTreeState::SliderAttachment> mixBalanceAttachment;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BackwardsAudioProcessorEditor)
 };

@@ -11,26 +11,29 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
-
 //==============================================================================
 BackwardsAudioProcessor::BackwardsAudioProcessor()
+:
 #ifndef JucePlugin_PreferredChannelConfigurations
-     : AudioProcessor (BusesProperties()
+       AudioProcessor (BusesProperties()
                      #if ! JucePlugin_IsMidiEffect
                       #if ! JucePlugin_IsSynth
                        .withInput  ("Input",  AudioChannelSet::stereo(), true)
                       #endif
                        .withOutput ("Output", AudioChannelSet::stereo(), true)
                      #endif
-                       )
+                       ),
 #endif
+    parameters(*this, nullptr)
 {
-    userParameters.insert(std::make_pair(ControlParameter::RoomSize, 0.0f));
-    userParameters.insert(std::make_pair(ControlParameter::Liveness, 0.0f));
-    userParameters.insert(std::make_pair(ControlParameter::Delay, 0.0f));
-    userParameters.insert(std::make_pair(ControlParameter::LPF, 0.0f));
-    userParameters.insert(std::make_pair(ControlParameter::OutputLevel, 0.7f));
-    userParameters.insert(std::make_pair(ControlParameter::MixBalance, 0.0f));
+    parameters.createAndAddParameter("roomsize", "ROOMSIZE", "",    NormalisableRange<float>(0.1f, 20.0f,  0.1f), 0.8f,   valueToTextFunction, nullptr);
+    parameters.createAndAddParameter("liveness", "LIVENESS", "",    NormalisableRange<float>(0.0f, 10.0f,  1.0f), 6.0f,   valueToTextFunction, nullptr);
+    parameters.createAndAddParameter("delay",    "DELAY",    "ms",  NormalisableRange<float>(0.0f, 500.0f, 0.1f), 15.0f,  valueToTextFunction, nullptr);
+    parameters.createAndAddParameter("lpf",      "LPF",      "kHz", NormalisableRange<float>(1.0f, 11.0f,  0.1f), 3.2f,   valueToTextFunction, nullptr);
+    parameters.createAndAddParameter("out_lvl",  "OUT LVL",  "%",   NormalisableRange<float>(0.0f, 100.0f, 1.0f), 80.0f,  valueToTextFunction, nullptr);
+    parameters.createAndAddParameter("mix_bal",  "MIX BAL",  "%",   NormalisableRange<float>(0.0f, 100.0f, 1.0f), 100.0f, valueToTextFunction, nullptr);
+
+    parameters.state = ValueTree(Identifier("Backwards"));
 }
 
 BackwardsAudioProcessor::~BackwardsAudioProcessor()
@@ -159,114 +162,22 @@ bool BackwardsAudioProcessor::hasEditor() const
 
 AudioProcessorEditor* BackwardsAudioProcessor::createEditor()
 {
-    return new BackwardsAudioProcessorEditor (*this);
+    return new BackwardsAudioProcessorEditor (*this, parameters);
 }
 
 //==============================================================================
 void BackwardsAudioProcessor::getStateInformation (MemoryBlock& destData)
 {
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
-    XmlElement root("Root");
-    XmlElement *el;
-    el = root.createNewChildElement("RoomSize");
-    el->addTextElement(String(userParameters[ControlParameter::RoomSize]));
-    el = root.createNewChildElement("Liveness");
-    el->addTextElement(String(userParameters[ControlParameter::Liveness]));
-    el = root.createNewChildElement("Delay");
-    el->addTextElement(String(userParameters[ControlParameter::Delay]));
-    el = root.createNewChildElement("LPF");
-    el->addTextElement(String(userParameters[ControlParameter::LPF]));
-    el = root.createNewChildElement("OutputLevel");
-    el->addTextElement(String(userParameters[ControlParameter::OutputLevel]));
-    el = root.createNewChildElement("MixBalance");
-    el->addTextElement(String(userParameters[ControlParameter::MixBalance]));
-    copyXmlToBinary(root, destData);
-
+   ScopedPointer<XmlElement> xml(parameters.state.createXml());
+   copyXmlToBinary(*xml, destData);
 }
 
 void BackwardsAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
-    XmlElement* pRoot = getXmlFromBinary(data, sizeInBytes);
-    if (pRoot != nullptr)
-    {
-        forEachXmlChildElement((*pRoot), pChild)
-        {
-            String text = pChild->getAllSubText();
-            if (pChild->hasTagName("RoomSize"))
-            {
-                setParameter(static_cast<int>(ControlParameter::RoomSize), text.getFloatValue());
-            }
-            else if (pChild->hasTagName("Liveness"))
-            {
-                setParameter(static_cast<int>(ControlParameter::Liveness), text.getFloatValue());
-            }
-            else if (pChild->hasTagName("Delay"))
-            {
-                setParameter(static_cast<int>(ControlParameter::Delay), text.getFloatValue());
-            }
-            else if (pChild->hasTagName("LPF"))
-            {
-                setParameter(static_cast<int>(ControlParameter::LPF), text.getFloatValue());
-            }
-            else if (pChild->hasTagName("OutputLevel"))
-            {
-                setParameter(static_cast<int>(ControlParameter::OutputLevel), text.getFloatValue());
-            }
-            else if (pChild->hasTagName("MixBalance"))
-            {
-                setParameter(static_cast<int>(ControlParameter::MixBalance), text.getFloatValue());
-            }
-        }
-        delete pRoot;
-    }
-}
-
-//==============================================================================
-int BackwardsAudioProcessor::getNumParameters()
-{
-    return static_cast<int>(ControlParameter::totalNum);
-}
-
-float BackwardsAudioProcessor::getParameter(int index)
-{
-    auto parameterIterator = userParameters.find(static_cast<ControlParameter>(index));
-    if (parameterIterator == userParameters.end()) return 0;
-    return parameterIterator->second;
-}
-
-void BackwardsAudioProcessor::setParameter(int index, float value)
-{
-    const ControlParameter& controlParameterIndex = static_cast<ControlParameter>(index);
-    auto parameterIterator = userParameters.find(controlParameterIndex);
-    if (parameterIterator == userParameters.end()) return;
-
-    auto& parameterValue = parameterIterator->second;
-    parameterValue = value;
-}
-
-const String BackwardsAudioProcessor::getParameterName(int index)
-{
-    const ControlParameter& controlParameterIndex = static_cast<ControlParameter>(index);
-    return controlParameterIndex == ControlParameter::RoomSize ? "ROOMSIZE"
-        : controlParameterIndex == ControlParameter::Liveness ? "LIVENESS"
-        : controlParameterIndex == ControlParameter::Delay ? "DELAY"
-        : controlParameterIndex == ControlParameter::LPF ? "LPF"
-        : controlParameterIndex == ControlParameter::OutputLevel ? "OUT LVL"
-        : controlParameterIndex == ControlParameter::MixBalance ? "MIX BAL"
-        : String::empty;
-}
-
-const String BackwardsAudioProcessor::getParameterText(int index)
-{
-    const ControlParameter& controlParameterIndex = static_cast<ControlParameter>(index);
-    auto parameterIterator = userParameters.find(controlParameterIndex);
-    if (parameterIterator == userParameters.end()) return String();
-
-    return String(parameterIterator->second);
+    ScopedPointer<XmlElement> xmlState(getXmlFromBinary(data, sizeInBytes));
+    if (xmlState != nullptr)
+        if (xmlState->hasTagName(parameters.state.getType()))
+            parameters.state = ValueTree::fromXml(*xmlState);
 }
 
 //==============================================================================

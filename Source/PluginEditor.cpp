@@ -13,8 +13,8 @@
 
 
 //==============================================================================
-BackwardsAudioProcessorEditor::BackwardsAudioProcessorEditor (BackwardsAudioProcessor& p)
-    : AudioProcessorEditor (&p), processor (p)
+BackwardsAudioProcessorEditor::BackwardsAudioProcessorEditor (BackwardsAudioProcessor& p, AudioProcessorValueTreeState& vts)
+    : AudioProcessorEditor (&p), processor (p), valueTreeState(vts)
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
@@ -24,36 +24,24 @@ BackwardsAudioProcessorEditor::BackwardsAudioProcessorEditor (BackwardsAudioProc
     title.setText("Backwards", dontSendNotification);
 
     roomSize.setSliderStyle(Slider::LinearHorizontal);
-    roomSize.setRange(0.1, 20, 0.1);
-    roomSize.setValue(0.8);
     roomSizeLabel.setText("ROOMSIZE", dontSendNotification);
 
     liveness.setSliderStyle(Slider::LinearHorizontal);
-    liveness.setRange(0, 10, 1);
-    liveness.setValue(6);
     livenessLabel.setText("LIVENESS", dontSendNotification);
 
     delay.setSliderStyle(Slider::LinearHorizontal);
-    delay.setRange(0, 500, 0.1);
-    delay.setValue(15);
     delay.setTextValueSuffix("ms");
     delayLabel.setText("DELAY", dontSendNotification);
 
     lowpassFilter.setSliderStyle(Slider::LinearHorizontal);
-    lowpassFilter.setRange(1.0, 11, 0.1);
-    lowpassFilter.setValue(3.2);
     lowpassFilter.setTextValueSuffix("kHz");
     lowpassFilterLabel.setText("LPF", dontSendNotification);
 
     outputLevel.setSliderStyle(Slider::LinearHorizontal);
-    outputLevel.setRange(0, 100, 1);
-    outputLevel.setValue(80);
     outputLevel.setTextValueSuffix("%");
     outputLevelLabel.setText("OUT LVL", dontSendNotification);
 
     mixBalance.setSliderStyle(Slider::LinearHorizontal);
-    mixBalance.setRange(0, 100, 1);
-    mixBalance.setValue(100);
     mixBalance.setTextValueSuffix("%");
     mixBalanceLabel.setText("MIX BAL", dontSendNotification);
 
@@ -71,15 +59,12 @@ BackwardsAudioProcessorEditor::BackwardsAudioProcessorEditor (BackwardsAudioProc
     addAndMakeVisible(&mixBalance);
     addAndMakeVisible(&mixBalanceLabel);
 
-    roomSize.addListener(this);
-    liveness.addListener(this);
-    delay.addListener(this);
-    lowpassFilter.addListener(this);
-    outputLevel.addListener(this);
-    mixBalance.addListener(this);
-
-    startTimer(30);
-
+    roomSizeAttachment      = new AudioProcessorValueTreeState::SliderAttachment(valueTreeState, "roomsize", roomSize);
+    livenessAttachment      = new AudioProcessorValueTreeState::SliderAttachment(valueTreeState, "liveness", liveness);
+    delayAttachment         = new AudioProcessorValueTreeState::SliderAttachment(valueTreeState, "delay",    delay);
+    lowpassFilterAttachment = new AudioProcessorValueTreeState::SliderAttachment(valueTreeState, "lpf",      lowpassFilter);
+    outputLevelAttachment   = new AudioProcessorValueTreeState::SliderAttachment(valueTreeState, "out_lvl",  outputLevel);
+    mixBalanceAttachment    = new AudioProcessorValueTreeState::SliderAttachment(valueTreeState, "mix_bal",  mixBalance);
 }
 
 BackwardsAudioProcessorEditor::~BackwardsAudioProcessorEditor()
@@ -123,42 +108,4 @@ void BackwardsAudioProcessorEditor::resized()
     outputLevel.setBounds(outputLevelArea.removeFromLeft(WINDOW_WIDTH - LABEL_WIDTH));
     mixBalanceLabel.setBounds(mixBalanceArea.removeFromLeft(LABEL_WIDTH));
     mixBalance.setBounds(mixBalanceArea.removeFromLeft(WINDOW_WIDTH - LABEL_WIDTH));
-}
-
-void BackwardsAudioProcessorEditor::sliderValueChanged(Slider * changedSlider)
-{
-    if (changedSlider == &roomSize)
-    {
-        processor.setParameterNotifyingHost(static_cast<int>(ControlParameter::RoomSize), static_cast<float>(roomSize.getValue()));
-    }
-    else if (changedSlider == &liveness)
-    {
-        processor.setParameterNotifyingHost(static_cast<int>(ControlParameter::Liveness), static_cast<float>(liveness.getValue()));
-    }
-    else if (changedSlider == &delay)
-    {
-        processor.setParameterNotifyingHost(static_cast<int>(ControlParameter::Delay), static_cast<float>(delay.getValue()));
-    }
-    else if (changedSlider == &lowpassFilter)
-    {
-        processor.setParameterNotifyingHost(static_cast<int>(ControlParameter::LPF), static_cast<float>(lowpassFilter.getValue()));
-    }
-    else if (changedSlider == &outputLevel)
-    {
-        processor.setParameterNotifyingHost(static_cast<int>(ControlParameter::OutputLevel), static_cast<float>(outputLevel.getValue()));
-    }
-    else if (changedSlider == &mixBalance)
-    {
-        processor.setParameterNotifyingHost(static_cast<int>(ControlParameter::MixBalance), static_cast<float>(mixBalance.getValue()));
-    }
-}
-
-void BackwardsAudioProcessorEditor::timerCallback()
-{
-    roomSize.setValue(processor.getParameter(static_cast<int>(ControlParameter::RoomSize)), dontSendNotification);
-    liveness.setValue(processor.getParameter(static_cast<int>(ControlParameter::Liveness)), dontSendNotification);
-    delay.setValue(processor.getParameter(static_cast<int>(ControlParameter::Delay)), dontSendNotification);
-    lowpassFilter.setValue(processor.getParameter(static_cast<int>(ControlParameter::LPF)), dontSendNotification);
-    outputLevel.setValue(processor.getParameter(static_cast<int>(ControlParameter::OutputLevel)), dontSendNotification);
-    mixBalance.setValue(processor.getParameter(static_cast<int>(ControlParameter::MixBalance)), dontSendNotification);
 }
