@@ -152,6 +152,11 @@ void BackwardsAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffe
 
         // ..do something to the data...
     }
+    
+    // Output Level
+    // [0, 100]  -> [0, 0.7]
+    float normalizedOutputValue = *(parameters.getRawParameterValue("out_lvl")) / parameters.getParameterRange("out_lvl").end * 0.7;
+    buffer.applyGain(pow(normalizedOutputValue, 2) * 2.0f);
 }
 
 //==============================================================================
