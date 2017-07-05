@@ -11,8 +11,6 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include <map>
-#include "Const/ControlParameter.h"
 
 //==============================================================================
 /**
@@ -57,8 +55,6 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
 private:
-    //==============================================================================
-
     //==============================================================================
     AudioProcessorValueTreeState parameters;
 
