@@ -24,7 +24,8 @@ BackwardsAudioProcessor::BackwardsAudioProcessor()
                      #endif
                        ),
 #endif
-    parameters(*this, nullptr)
+    parameters(*this, nullptr),
+    delayLine(2, 1)
 {
     parameters.createAndAddParameter("roomsize", "ROOMSIZE", "",    NormalisableRange<float>(0.1f, 20.0f,  0.1f), 0.8f,   valueToTextFunction, nullptr);
     parameters.createAndAddParameter("liveness", "LIVENESS", "",    NormalisableRange<float>(0.0f, 10.0f,  1.0f), 6.0f,   valueToTextFunction, nullptr);
@@ -97,7 +98,11 @@ void BackwardsAudioProcessor::changeProgramName (int index, const String& newNam
 void BackwardsAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     // Use this method as the place to do any pre-playback
-    // initialisation that you need..
+    // initialisation that you need..jj
+    delayLineLength = static_cast<int>(((multiTapDelayMiliSec.back() + parameters.getParameterRange("delay").end) / ONE_IN_MILLI) * sampleRate);
+    if(delayLineLength < 1) delayLineLength = 1;
+    delayLine.setSize(2, delayLineLength);
+    delayLine.clear();
 }
 
 void BackwardsAudioProcessor::releaseResources()
