@@ -30,19 +30,15 @@ BackwardsAudioProcessorEditor::BackwardsAudioProcessorEditor (BackwardsAudioProc
     livenessLabel.setText(valueTreeState.getParameter("liveness")->name, dontSendNotification);
 
     delay.setSliderStyle(Slider::LinearHorizontal);
-    delay.setTextValueSuffix(valueTreeState.getParameter("delay")->label);
     delayLabel.setText(valueTreeState.getParameter("delay")->name, dontSendNotification);
 
     lowpassFilter.setSliderStyle(Slider::LinearHorizontal);
-    lowpassFilter.setTextValueSuffix(valueTreeState.getParameter("lpf")->label);
     lowpassFilterLabel.setText(valueTreeState.getParameter("lpf")->name, dontSendNotification);
 
     outputLevel.setSliderStyle(Slider::LinearHorizontal);
-    outputLevel.setTextValueSuffix(valueTreeState.getParameter("out_lvl")->label);
     outputLevelLabel.setText(valueTreeState.getParameter("out_lvl")->name, dontSendNotification);
 
     mixBalance.setSliderStyle(Slider::LinearHorizontal);
-    mixBalance.setTextValueSuffix(valueTreeState.getParameter("mix_bal")->label);
     mixBalanceLabel.setText(valueTreeState.getParameter("mix_bal")->name, dontSendNotification);
 
     addAndMakeVisible(&title);
