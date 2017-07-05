@@ -99,7 +99,7 @@ void BackwardsAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..jj
-    delayLineLength = static_cast<int>(((multiTapDelayMiliSec.back() + parameters.getParameterRange("delay").end) / ONE_IN_MILLI) * sampleRate);
+    delayLineLength = static_cast<int>(((multiTapDelayMilliSec.back() + parameters.getParameterRange("delay").end) / ONE_IN_MILLI) * sampleRate);
     if(delayLineLength < 1) delayLineLength = 1;
     delayLine.setSize(2, delayLineLength);
     delayLine.clear();
