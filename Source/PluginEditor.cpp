@@ -24,26 +24,26 @@ BackwardsAudioProcessorEditor::BackwardsAudioProcessorEditor (BackwardsAudioProc
     title.setText("Backwards", dontSendNotification);
 
     roomSize.setSliderStyle(Slider::LinearHorizontal);
-    roomSizeLabel.setText("ROOMSIZE", dontSendNotification);
+    roomSizeLabel.setText(valueTreeState.getParameter("roomsize")->name, dontSendNotification);
 
     liveness.setSliderStyle(Slider::LinearHorizontal);
-    livenessLabel.setText("LIVENESS", dontSendNotification);
+    livenessLabel.setText(valueTreeState.getParameter("liveness")->name, dontSendNotification);
 
     delay.setSliderStyle(Slider::LinearHorizontal);
-    delay.setTextValueSuffix("ms");
-    delayLabel.setText("DELAY", dontSendNotification);
+    delay.setTextValueSuffix(valueTreeState.getParameter("delay")->label);
+    delayLabel.setText(valueTreeState.getParameter("delay")->name, dontSendNotification);
 
     lowpassFilter.setSliderStyle(Slider::LinearHorizontal);
-    lowpassFilter.setTextValueSuffix("kHz");
-    lowpassFilterLabel.setText("LPF", dontSendNotification);
+    lowpassFilter.setTextValueSuffix(valueTreeState.getParameter("lpf")->label);
+    lowpassFilterLabel.setText(valueTreeState.getParameter("lpf")->name, dontSendNotification);
 
     outputLevel.setSliderStyle(Slider::LinearHorizontal);
-    outputLevel.setTextValueSuffix("%");
-    outputLevelLabel.setText("OUT LVL", dontSendNotification);
+    outputLevel.setTextValueSuffix(valueTreeState.getParameter("out_lvl")->label);
+    outputLevelLabel.setText(valueTreeState.getParameter("out_lvl")->name, dontSendNotification);
 
     mixBalance.setSliderStyle(Slider::LinearHorizontal);
-    mixBalance.setTextValueSuffix("%");
-    mixBalanceLabel.setText("MIX BAL", dontSendNotification);
+    mixBalance.setTextValueSuffix(valueTreeState.getParameter("mix_bal")->label);
+    mixBalanceLabel.setText(valueTreeState.getParameter("mix_bal")->name, dontSendNotification);
 
     addAndMakeVisible(&title);
     addAndMakeVisible(&roomSize);
