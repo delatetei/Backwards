@@ -161,14 +161,43 @@ void BackwardsAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffe
     for (int i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
+    int dpw = 0;
+    std::list<int> dprs;
+
+    float wet = *(parameters.getRawParameterValue("mix_bal")) / parameters.getParameterRange("mix_bal").end;
+    float dry = 1.0f - wet;
+
     // This is the place where you'd normally do the guts of your plugin's
     // audio processing...
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
         float* channelData = buffer.getWritePointer (channel);
+        float* delayData = delayLine.getWritePointer(jmin(channel, delayLine.getNumChannels() - 1));
 
-        // ..do something to the data...
+        dpw = delayWritePosition;
+        dprs = delayReadPositions;
+
+        for (int buffNum = 0; buffNum < buffer.getNumSamples(); ++buffNum)
+        {
+            delayData[dpw] = channelData[buffNum];
+            float out = 0;
+            int count = 0;
+            for (auto dpr : dprs)
+            {
+                out += delayData[dpr] * 0.005f * ++count;
+            }
+            channelData[buffNum] = channelData[buffNum] * dry + out * wet;
+
+            if(++dpw >= delayLineLength) dpw = 0;
+            for (auto& dpr : dprs)
+            {
+                if(++dpr >= delayLineLength) dpr = 0;
+            }
+        }
     }
+
+    delayWritePosition = dpw;
+    delayReadPositions = std::move(dprs);
     
     // Output Level
     // [0, 100]  -> [0, 0.7]
