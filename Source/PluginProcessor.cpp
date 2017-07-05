@@ -11,6 +11,7 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+
 //==============================================================================
 BackwardsAudioProcessor::BackwardsAudioProcessor()
 :
@@ -25,7 +26,8 @@ BackwardsAudioProcessor::BackwardsAudioProcessor()
                        ),
 #endif
     parameters(*this, nullptr),
-    delayLine(2, 1)
+    delayLine(2, 1),
+    delayWritePosition(0)
 {
     parameters.createAndAddParameter("roomsize", "ROOMSIZE", "",    NormalisableRange<float>(0.1f, 20.0f,  0.1f), 0.8f,   valueToTextFunction, nullptr);
     parameters.createAndAddParameter("liveness", "LIVENESS", "",    NormalisableRange<float>(0.0f, 10.0f,  1.0f), 6.0f,   valueToTextFunction, nullptr);
@@ -33,6 +35,8 @@ BackwardsAudioProcessor::BackwardsAudioProcessor()
     parameters.createAndAddParameter("lpf",      "LPF",      "kHz", NormalisableRange<float>(1.0f, 11.0f,  0.1f), 3.2f,   valueToTextFunction, nullptr);
     parameters.createAndAddParameter("out_lvl",  "OUT LVL",  "%",   NormalisableRange<float>(0.0f, 100.0f, 1.0f), 80.0f,  valueToTextFunction, nullptr);
     parameters.createAndAddParameter("mix_bal",  "MIX BAL",  "%",   NormalisableRange<float>(0.0f, 100.0f, 1.0f), 100.0f, valueToTextFunction, nullptr);
+
+    parameters.addParameterListener("delay", new DelayParameterListener(*this));
 
     parameters.state = ValueTree(Identifier("Backwards"));
 }
@@ -103,6 +107,14 @@ void BackwardsAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
     if(delayLineLength < 1) delayLineLength = 1;
     delayLine.setSize(2, delayLineLength);
     delayLine.clear();
+
+    if (delayReadPositions.empty())
+    {
+        for (auto delayMilliSec : multiTapDelayMilliSec)
+        {
+            delayReadPositions.push_back(calculateReadPosition(delayMilliSec, sampleRate));
+        }
+    }
 }
 
 void BackwardsAudioProcessor::releaseResources()
@@ -190,9 +202,31 @@ void BackwardsAudioProcessor::setStateInformation (const void* data, int sizeInB
             parameters.state = ValueTree::fromXml(*xmlState);
 }
 
+int BackwardsAudioProcessor::calculateReadPosition(int delayMiliSec, double sampleRate)
+{
+    const int OFFSET_SAMPLE_NUM = 1;
+    return (delayWritePosition - static_cast<int>((delayMiliSec + *(parameters.getRawParameterValue("delay"))) / ONE_IN_MILLI * sampleRate) + delayLineLength) % delayLineLength + OFFSET_SAMPLE_NUM;
+}
+
 //==============================================================================
 // This creates new instances of the plugin..
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new BackwardsAudioProcessor();
+}
+
+//==============================================================================
+// Inner Class
+BackwardsAudioProcessor::DelayParameterListener::DelayParameterListener(BackwardsAudioProcessor & p)
+:_p(p)
+{
+}
+
+void BackwardsAudioProcessor::DelayParameterListener::parameterChanged(const String & parameterID, float newValue)
+{
+    auto delayMiliSecIterator = _p.multiTapDelayMilliSec.cbegin();
+    for (auto& dpr : _p.delayReadPositions)
+    {
+        dpr = _p.calculateReadPosition(*(delayMiliSecIterator++), _p.getSampleRate());
+    }
 }
