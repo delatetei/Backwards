@@ -113,7 +113,7 @@ void BackwardsAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
     {
         for (auto delayMilliSec : multiTapDelayMilliSec)
         {
-            delayReadPositions.push_back(calculateReadPosition(delayMilliSec, sampleRate));
+            delayReadPositions.push_back(calculateReadPosition(delayMilliSec, sampleRate, *(parameters.getRawParameterValue("delay"))));
         }
     }
 }
@@ -232,10 +232,10 @@ void BackwardsAudioProcessor::setStateInformation (const void* data, int sizeInB
             parameters.state = ValueTree::fromXml(*xmlState);
 }
 
-int BackwardsAudioProcessor::calculateReadPosition(int delayMiliSec, double sampleRate)
+int BackwardsAudioProcessor::calculateReadPosition(int delayMiliSec, double sampleRate, float preDelayMilliSec)
 {
     const int OFFSET_SAMPLE_NUM = 1;
-    return (delayWritePosition - static_cast<int>((delayMiliSec + *(parameters.getRawParameterValue("delay"))) / ONE_IN_MILLI * sampleRate) + delayLineLength) % delayLineLength + OFFSET_SAMPLE_NUM;
+    return (delayWritePosition - static_cast<int>((delayMiliSec + preDelayMilliSec) / ONE_IN_MILLI * sampleRate) + delayLineLength) % delayLineLength + OFFSET_SAMPLE_NUM;
 }
 
 //==============================================================================
@@ -257,6 +257,6 @@ void BackwardsAudioProcessor::DelayParameterListener::parameterChanged(const Str
     auto delayMiliSecIterator = _p.multiTapDelayMilliSec.cbegin();
     for (auto& dpr : _p.delayReadPositions)
     {
-        dpr = _p.calculateReadPosition(*(delayMiliSecIterator++), _p.getSampleRate());
+        dpr = _p.calculateReadPosition(*(delayMiliSecIterator++), _p.getSampleRate(), newValue);
     }
 }

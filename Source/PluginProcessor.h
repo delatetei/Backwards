@@ -68,7 +68,7 @@ private:
 
     };
     //==============================================================================
-    int calculateReadPosition(int delayMiliSec, double sampleRate);
+    int calculateReadPosition(int delayMiliSec, double sampleRate, float preDelayMilliSec);
 
     //==============================================================================
     const float ONE_IN_MILLI = 1000.0f;
