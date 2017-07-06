@@ -88,7 +88,3 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BackwardsAudioProcessor)
 };
 
-static String valueToTextFunction(float value)
-{
-    return String(value);
-};
