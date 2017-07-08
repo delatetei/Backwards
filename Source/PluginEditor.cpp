@@ -18,7 +18,7 @@ BackwardsAudioProcessorEditor::BackwardsAudioProcessorEditor (BackwardsAudioProc
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (WINDOW_WIDTH, WINDOW_HEIGHT);
+    setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 
     title.setFont(Font(40));
     title.setText("Backwards", dontSendNotification);
@@ -71,10 +71,10 @@ BackwardsAudioProcessorEditor::~BackwardsAudioProcessorEditor()
 void BackwardsAudioProcessorEditor::paint (Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
-    g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
+    g.fillAll(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));
 
-    g.setColour (Colours::white);
-    g.setFont (15.0f);
+    g.setColour(Colours::white);
+    g.setFont(15.0f);
 }
 
 void BackwardsAudioProcessorEditor::resized()
@@ -90,7 +90,7 @@ void BackwardsAudioProcessorEditor::resized()
     Rectangle<int> lowpassFilterArea(area.removeFromTop(ITEM_HEIGHT));
     Rectangle<int> outputLevelArea(area.removeFromTop(ITEM_HEIGHT));
     Rectangle<int> mixBalanceArea(area.removeFromTop(ITEM_HEIGHT));
-    
+
     title.setBounds(headerArea.removeFromTop(HEADER_HEIGHT));
     roomSizeLabel.setBounds(roomSizeArea.removeFromLeft(LABEL_WIDTH));
     roomSize.setBounds(roomSizeArea.removeFromLeft(WINDOW_WIDTH - LABEL_WIDTH));

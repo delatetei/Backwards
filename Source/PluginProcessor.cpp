@@ -105,7 +105,7 @@ void BackwardsAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
     // Use this method as the place to do any pre-playback
     // initialisation that you need..jj
     delayLineLength = static_cast<int>(((multiTapDelayMilliSec.back() + parameters.getParameterRange("delay").end) / ONE_IN_MILLI) * sampleRate);
-    if(delayLineLength < 1) delayLineLength = 1;
+    if (delayLineLength < 1) delayLineLength = 1;
     delayLine.setSize(2, delayLineLength);
     delayLine.clear();
 
@@ -172,7 +172,7 @@ void BackwardsAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffe
     // audio processing...
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
-        float* channelData = buffer.getWritePointer (channel);
+        float* channelData = buffer.getWritePointer(channel);
         float* delayData = delayLine.getWritePointer(jmin(channel, delayLine.getNumChannels() - 1));
 
         dpw = delayWritePosition;
@@ -189,17 +189,17 @@ void BackwardsAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffe
             }
             channelData[buffNum] = channelData[buffNum] * dry + out * wet;
 
-            if(++dpw >= delayLineLength) dpw = 0;
+            if (++dpw >= delayLineLength) dpw = 0;
             for (int & dpr : dprs)
             {
-                if(++dpr >= delayLineLength) dpr = 0;
+                if (++dpr >= delayLineLength) dpr = 0;
             }
         }
     }
 
     delayWritePosition = dpw;
     delayReadPositions = std::move(dprs);
-    
+
     // Output Level
     // [0, 100]  -> [0, 0.7]
     float normalizedOutputValue = *(parameters.getRawParameterValue("out_lvl")) / parameters.getParameterRange("out_lvl").end * 0.7f;
