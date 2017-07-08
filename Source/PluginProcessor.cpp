@@ -183,14 +183,14 @@ void BackwardsAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffe
             delayData[dpw] = channelData[buffNum];
             float out = 0;
             int count = 0;
-            for (auto dpr : dprs)
+            for (const int dpr : dprs)
             {
                 out += delayData[dpr] * 0.005f * ++count;
             }
             channelData[buffNum] = channelData[buffNum] * dry + out * wet;
 
             if(++dpw >= delayLineLength) dpw = 0;
-            for (auto& dpr : dprs)
+            for (int & dpr : dprs)
             {
                 if(++dpr >= delayLineLength) dpr = 0;
             }
