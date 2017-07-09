@@ -165,8 +165,8 @@ void BackwardsAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffe
     int dpw = 0;
     std::list<int> dprs;
 
-    float wet = *(parameters.getRawParameterValue("mix_bal")) / parameters.getParameterRange("mix_bal").end;
-    float dry = 1.0f - wet;
+    const float wet = *(parameters.getRawParameterValue("mix_bal")) / parameters.getParameterRange("mix_bal").end;
+    const float dry = 1.0f - wet;
 
     // This is the place where you'd normally do the guts of your plugin's
     // audio processing...
