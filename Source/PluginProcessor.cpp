@@ -26,8 +26,7 @@ BackwardsAudioProcessor::BackwardsAudioProcessor()
                        ),
 #endif
     parameters(*this, nullptr),
-    delayLine(2, 1),
-    delayWritePosition(0)
+    multiTapDelayLine{multiTapDelayMilliSec, multiTapDelayMilliSec}
 {
     auto valueToTextFunction = [](float value) { return String(value); };
     parameters.createAndAddParameter("roomsize", "ROOMSIZE", "",    NormalisableRange<float>(0.1f, 20.0f,  0.1f), 0.8f,   valueToTextFunction, nullptr);
@@ -103,18 +102,14 @@ void BackwardsAudioProcessor::changeProgramName (int index, const String& newNam
 void BackwardsAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     // Use this method as the place to do any pre-playback
-    // initialisation that you need..jj
-    delayLineLength = static_cast<int>(((multiTapDelayMilliSec.back() + parameters.getParameterRange("delay").end) / ONE_IN_MILLI) * sampleRate);
-    if (delayLineLength < 1) delayLineLength = 1;
-    delayLine.setSize(2, delayLineLength);
-    delayLine.clear();
-
-    if (delayReadPositions.empty())
+    // initialisation that you need..jj1G
+    for (auto& delayLine : multiTapDelayLine)
     {
-        for (auto delayMilliSec : multiTapDelayMilliSec)
-        {
-            delayReadPositions.push_back(calculateReadPosition(delayMilliSec, sampleRate, *(parameters.getRawParameterValue("delay"))));
-        }
+        delayLine.init(
+            sampleRate,
+            parameters.getParameterRange("delay").end,
+            *(parameters.getRawParameterValue("delay"))
+        );
     }
 }
 
@@ -162,9 +157,6 @@ void BackwardsAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffe
     for (int i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-    int dpw = 0;
-    std::list<int> dprs;
-
     const float wet = *(parameters.getRawParameterValue("mix_bal")) / parameters.getParameterRange("mix_bal").end;
     const float dry = 1.0f - wet;
 
@@ -173,32 +165,16 @@ void BackwardsAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffe
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
         float* channelData = buffer.getWritePointer(channel);
-        float* delayData = delayLine.getWritePointer(jmin(channel, delayLine.getNumChannels() - 1));
-
-        dpw = delayWritePosition;
-        dprs = delayReadPositions;
+        AudioSampleBuffer delayBuffer;
+        delayBuffer.makeCopyOf(buffer);
+        float* delayData = delayBuffer.getWritePointer(channel);
+        multiTapDelayLine[channel].processSamples(delayData, buffer.getNumSamples());
 
         for (int buffNum = 0; buffNum < buffer.getNumSamples(); ++buffNum)
         {
-            delayData[dpw] = channelData[buffNum];
-            float out = 0;
-            int count = 0;
-            for (const int dpr : dprs)
-            {
-                out += delayData[dpr] * 0.005f * ++count;
-            }
-            channelData[buffNum] = channelData[buffNum] * dry + out * wet;
-
-            if (++dpw >= delayLineLength) dpw = 0;
-            for (int & dpr : dprs)
-            {
-                if (++dpr >= delayLineLength) dpr = 0;
-            }
+            channelData[buffNum] = channelData[buffNum] * dry + delayData[buffNum] * wet;
         }
     }
-
-    delayWritePosition = dpw;
-    delayReadPositions = std::move(dprs);
 
     // Output Level
     // [0, 100]  -> [0, 0.7]
@@ -232,11 +208,6 @@ void BackwardsAudioProcessor::setStateInformation (const void* data, int sizeInB
             parameters.state = ValueTree::fromXml(*xmlState);
 }
 
-int BackwardsAudioProcessor::calculateReadPosition(int delayMiliSec, double sampleRate, float preDelayMilliSec)
-{
-    const int OFFSET_SAMPLE_NUM = 1;
-    return (delayWritePosition - static_cast<int>((delayMiliSec + preDelayMilliSec) / ONE_IN_MILLI * sampleRate) + delayLineLength) % delayLineLength + OFFSET_SAMPLE_NUM;
-}
 
 //==============================================================================
 // This creates new instances of the plugin..
@@ -254,9 +225,8 @@ BackwardsAudioProcessor::DelayParameterListener::DelayParameterListener(Backward
 
 void BackwardsAudioProcessor::DelayParameterListener::parameterChanged(const String & parameterID, float newValue)
 {
-    auto delayMiliSecIterator = _p.multiTapDelayMilliSec.cbegin();
-    for (auto& dpr : _p.delayReadPositions)
+    for (auto& delayLine : _p.multiTapDelayLine)
     {
-        dpr = _p.calculateReadPosition(*(delayMiliSecIterator++), _p.getSampleRate(), newValue);
+        delayLine.recalculateReadPosition(newValue);
     }
 }

@@ -13,6 +13,10 @@
               pluginAAXCategory="AAX_ePlugInCategory_Dynamics" jucerVersion="5.0.2">
   <MAINGROUP id="vN7EwN" name="Backwards">
     <GROUP id="{452B85ED-4F0C-B4B0-46A5-E736E597DC30}" name="Source">
+      <FILE id="qzFOb8" name="MultiTapDelayLine.cpp" compile="1" resource="0"
+            file="Source/MultiTapDelayLine.cpp"/>
+      <FILE id="CJAAWx" name="MultiTapDelayLine.h" compile="0" resource="0"
+            file="Source/MultiTapDelayLine.h"/>
       <FILE id="Ny2ggX" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="AyKhUN" name="PluginProcessor.h" compile="0" resource="0"
