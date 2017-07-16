@@ -160,6 +160,9 @@ void BackwardsAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffe
     const float wet = *(parameters.getRawParameterValue("mix_bal")) / parameters.getParameterRange("mix_bal").end;
     const float dry = 1.0f - wet;
 
+    const double sampleRate = getSampleRate();
+    const float normalizedFrequency = *(parameters.getRawParameterValue("lpf")) * 1000.0f;
+
     // This is the place where you'd normally do the guts of your plugin's
     // audio processing...
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
@@ -169,6 +172,9 @@ void BackwardsAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffe
         delayBuffer.makeCopyOf(buffer);
         float* delayData = delayBuffer.getWritePointer(channel);
         multiTapDelayLine[channel].processSamples(delayData, buffer.getNumSamples());
+
+        iirFilter[channel].setCoefficients(IIRCoefficients::makeLowPass(sampleRate, normalizedFrequency));
+        iirFilter[channel].processSamples(delayData, delayBuffer.getNumSamples());
 
         for (int buffNum = 0; buffNum < buffer.getNumSamples(); ++buffNum)
         {

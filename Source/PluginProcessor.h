@@ -79,6 +79,9 @@ private:
                                                   179, 181, 191, 193, 197, 199, 211, 223, 227, 229 };
     std::vector<MultiTapDelayLine> multiTapDelayLine;
 
+    //==============================================================================
+    IIRFilter iirFilter[2];
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BackwardsAudioProcessor)
 };
 
