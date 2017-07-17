@@ -111,6 +111,7 @@ void BackwardsAudioProcessorEditor::resized()
     mixBalanceLabel.setBounds(mixBalanceArea.removeFromLeft(LABEL_WIDTH));
     mixBalance.setBounds(mixBalanceArea.removeFromLeft(WINDOW_WIDTH - LABEL_WIDTH));
 
+    changeLPFSliderState(valueTreeState.getParameter("thru")->getValue() == 0.0f ? true : false);
 }
 
 void BackwardsAudioProcessorEditor::changeLPFSliderState(bool state)
