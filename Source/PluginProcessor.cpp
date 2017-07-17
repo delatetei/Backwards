@@ -163,13 +163,14 @@ void BackwardsAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffe
     const double sampleRate = getSampleRate();
     const float normalizedFrequency = *(parameters.getRawParameterValue("lpf")) * 1000.0f;
 
+    AudioSampleBuffer delayBuffer;
+    delayBuffer.makeCopyOf(buffer);
+
     // This is the place where you'd normally do the guts of your plugin's
     // audio processing...
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
         float* channelData = buffer.getWritePointer(channel);
-        AudioSampleBuffer delayBuffer;
-        delayBuffer.makeCopyOf(buffer);
         float* delayData = delayBuffer.getWritePointer(channel);
         multiTapDelayLine[channel].processSamples(delayData, buffer.getNumSamples());
 
