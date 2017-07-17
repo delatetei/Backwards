@@ -59,7 +59,6 @@ void MultiTapDelayLine::processSamples(float* sample, int numSamples)
     for (int buffNum = 0; buffNum < numSamples; ++buffNum)
     {
         delayData[delayWritePosition] = sample[buffNum];
-        float out = 0;
         int count = 0;
         sample[buffNum] = 0;
         for (int& dpr : delayReadPositions)

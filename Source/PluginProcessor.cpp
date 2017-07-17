@@ -38,6 +38,7 @@ BackwardsAudioProcessor::BackwardsAudioProcessor()
     parameters.createAndAddParameter("thru",     "THRU",     "",    NormalisableRange<float>(0.0f, 1.0f,   1.0f), 0.0f,   valueToTextFunction, nullptr);
 
     parameters.addParameterListener("delay", new DelayParameterListener(*this));
+    parameters.addParameterListener("thru",  new ThruParameterListener(*this));
 
     parameters.state = ValueTree(Identifier("Backwards"));
 }
@@ -201,7 +202,8 @@ bool BackwardsAudioProcessor::hasEditor() const
 
 AudioProcessorEditor* BackwardsAudioProcessor::createEditor()
 {
-    return new BackwardsAudioProcessorEditor (*this, parameters);
+    editor = new BackwardsAudioProcessorEditor (*this, parameters);
+    return editor;
 }
 
 //==============================================================================
@@ -240,4 +242,14 @@ void BackwardsAudioProcessor::DelayParameterListener::parameterChanged(const Str
     {
         delayLine.recalculateReadPosition(newValue);
     }
+}
+
+BackwardsAudioProcessor::ThruParameterListener::ThruParameterListener(BackwardsAudioProcessor & p)
+:_p(p)
+{
+}
+
+void BackwardsAudioProcessor::ThruParameterListener::parameterChanged(const String & parameterID, float newValue)
+{
+    dynamic_cast<BackwardsAudioProcessorEditor*>(_p.editor)->changeLPFSliderState(newValue == 0.0f ? true : false);
 }

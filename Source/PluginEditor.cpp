@@ -110,4 +110,10 @@ void BackwardsAudioProcessorEditor::resized()
     outputLevel.setBounds(outputLevelArea.removeFromLeft(WINDOW_WIDTH - LABEL_WIDTH));
     mixBalanceLabel.setBounds(mixBalanceArea.removeFromLeft(LABEL_WIDTH));
     mixBalance.setBounds(mixBalanceArea.removeFromLeft(WINDOW_WIDTH - LABEL_WIDTH));
+
+}
+
+void BackwardsAudioProcessorEditor::changeLPFSliderState(bool state)
+{
+    lowpassFilter.setEnabled(state);
 }

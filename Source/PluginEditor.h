@@ -28,6 +28,8 @@ public:
     void paint (Graphics&) override;
     void resized() override;
 
+    //==============================================================================
+    void changeLPFSliderState(bool state);
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
