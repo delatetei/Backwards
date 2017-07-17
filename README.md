@@ -1,2 +1,2 @@
 # Backwards
-YAMAHA SPXのリバースディレイ風VST
+YAMAHA SPXのリバースゲート風VST
