@@ -40,6 +40,7 @@ private:
     const int HEADER_HEIGHT = 50;
     const int ITEM_HEIGHT= 24;
     const int LABEL_WIDTH= 100;
+    const int BYPASS_BUTTON_WIDTH = 70;
 
     //==============================================================================
     Label title;
@@ -51,6 +52,7 @@ private:
     Slider lowpassFilter;
     Slider outputLevel;
     Slider mixBalance;
+    ToggleButton thru;
     Label roomSizeLabel;
     Label livenessLabel;
     Label delayLabel;
@@ -65,6 +67,7 @@ private:
     ScopedPointer<AudioProcessorValueTreeState::SliderAttachment> lowpassFilterAttachment;
     ScopedPointer<AudioProcessorValueTreeState::SliderAttachment> outputLevelAttachment;
     ScopedPointer<AudioProcessorValueTreeState::SliderAttachment> mixBalanceAttachment;
+    ScopedPointer<AudioProcessorValueTreeState::ButtonAttachment> thruAttachment;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BackwardsAudioProcessorEditor)
 };

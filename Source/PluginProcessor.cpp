@@ -35,6 +35,7 @@ BackwardsAudioProcessor::BackwardsAudioProcessor()
     parameters.createAndAddParameter("lpf",      "LPF",      "kHz", NormalisableRange<float>(1.0f, 11.0f,  0.1f), 3.2f,   valueToTextFunction, nullptr);
     parameters.createAndAddParameter("out_lvl",  "OUT LVL",  "%",   NormalisableRange<float>(0.0f, 100.0f, 1.0f), 80.0f,  valueToTextFunction, nullptr);
     parameters.createAndAddParameter("mix_bal",  "MIX BAL",  "%",   NormalisableRange<float>(0.0f, 100.0f, 1.0f), 100.0f, valueToTextFunction, nullptr);
+    parameters.createAndAddParameter("thru",     "THRU",     "",    NormalisableRange<float>(0.0f, 1.0f,   1.0f), 0.0f,   valueToTextFunction, nullptr);
 
     parameters.addParameterListener("delay", new DelayParameterListener(*this));
 
@@ -174,8 +175,11 @@ void BackwardsAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffe
         float* delayData = delayBuffer.getWritePointer(channel);
         multiTapDelayLine[channel].processSamples(delayData, buffer.getNumSamples());
 
-        iirFilter[channel].setCoefficients(IIRCoefficients::makeLowPass(sampleRate, normalizedFrequency));
-        iirFilter[channel].processSamples(delayData, delayBuffer.getNumSamples());
+        if (*(parameters.getRawParameterValue("thru")) == 0.0f)
+        {
+            iirFilter[channel].setCoefficients(IIRCoefficients::makeLowPass(sampleRate, normalizedFrequency));
+            iirFilter[channel].processSamples(delayData, delayBuffer.getNumSamples());
+        }
 
         for (int buffNum = 0; buffNum < buffer.getNumSamples(); ++buffNum)
         {

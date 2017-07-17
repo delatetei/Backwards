@@ -41,6 +41,8 @@ BackwardsAudioProcessorEditor::BackwardsAudioProcessorEditor (BackwardsAudioProc
     mixBalance.setSliderStyle(Slider::LinearHorizontal);
     mixBalanceLabel.setText(valueTreeState.getParameter("mix_bal")->name, dontSendNotification);
 
+    thru.setButtonText(valueTreeState.getParameter("thru")->name);
+
     addAndMakeVisible(&title);
     addAndMakeVisible(&roomSize);
     addAndMakeVisible(&roomSizeLabel);
@@ -54,6 +56,7 @@ BackwardsAudioProcessorEditor::BackwardsAudioProcessorEditor (BackwardsAudioProc
     addAndMakeVisible(&outputLevelLabel);
     addAndMakeVisible(&mixBalance);
     addAndMakeVisible(&mixBalanceLabel);
+    addAndMakeVisible(&thru);
 
     roomSizeAttachment      = new AudioProcessorValueTreeState::SliderAttachment(valueTreeState, "roomsize", roomSize);
     livenessAttachment      = new AudioProcessorValueTreeState::SliderAttachment(valueTreeState, "liveness", liveness);
@@ -61,6 +64,7 @@ BackwardsAudioProcessorEditor::BackwardsAudioProcessorEditor (BackwardsAudioProc
     lowpassFilterAttachment = new AudioProcessorValueTreeState::SliderAttachment(valueTreeState, "lpf",      lowpassFilter);
     outputLevelAttachment   = new AudioProcessorValueTreeState::SliderAttachment(valueTreeState, "out_lvl",  outputLevel);
     mixBalanceAttachment    = new AudioProcessorValueTreeState::SliderAttachment(valueTreeState, "mix_bal",  mixBalance);
+    thruAttachment          = new AudioProcessorValueTreeState::ButtonAttachment(valueTreeState, "thru",     thru);
 }
 
 BackwardsAudioProcessorEditor::~BackwardsAudioProcessorEditor()
@@ -99,7 +103,9 @@ void BackwardsAudioProcessorEditor::resized()
     delayLabel.setBounds(delayArea.removeFromLeft(LABEL_WIDTH));
     delay.setBounds(delayArea.removeFromLeft(WINDOW_WIDTH - LABEL_WIDTH));
     lowpassFilterLabel.setBounds(lowpassFilterArea.removeFromLeft(LABEL_WIDTH));
-    lowpassFilter.setBounds(lowpassFilterArea.removeFromLeft(WINDOW_WIDTH - LABEL_WIDTH));
+    lowpassFilter.setBounds(lowpassFilterArea.removeFromLeft(WINDOW_WIDTH - LABEL_WIDTH - BYPASS_BUTTON_WIDTH));
+    thru.setBounds(lowpassFilterArea.removeFromLeft(BYPASS_BUTTON_WIDTH));
+
     outputLevelLabel.setBounds(outputLevelArea.removeFromLeft(LABEL_WIDTH));
     outputLevel.setBounds(outputLevelArea.removeFromLeft(WINDOW_WIDTH - LABEL_WIDTH));
     mixBalanceLabel.setBounds(mixBalanceArea.removeFromLeft(LABEL_WIDTH));
