@@ -79,6 +79,8 @@ void BackwardsAudioProcessorEditor::paint (Graphics& g)
 
     g.setColour(Colours::white);
     g.setFont(15.0f);
+
+    getLookAndFeel().setColour(Slider::thumbColourId, Colours::darkorchid);
 }
 
 void BackwardsAudioProcessorEditor::resized()
