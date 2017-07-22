@@ -53,9 +53,9 @@ int MultiTapDelayLine::calculateReadPosition(int delayMilliSec, float preDelayMi
 void MultiTapDelayLine::recalculateReadPosition(float preDelayMilliSec)
 {
     int i = 0;
-    for (auto& dpr : delayReadPositions)
+    for (auto& drp : delayReadPositions)
     {
-        dpr = calculateReadPosition(multiTapDelayMilliSec[i++], preDelayMilliSec);
+        drp = calculateReadPosition(multiTapDelayMilliSec[i++], preDelayMilliSec);
     }
 }
 
@@ -68,10 +68,10 @@ void MultiTapDelayLine::processSamples(float* sample, int numSamples)
         delayData[delayWritePosition] = sample[buffNum];
         int count = 0;
         sample[buffNum] = 0;
-        for (int& dpr : delayReadPositions)
+        for (int& drp : delayReadPositions)
         {
-            sample[buffNum] += delayData[dpr] * livenessCoefficients[count++];
-            if (++dpr >= delayLineLength) dpr = 0;
+            sample[buffNum] += delayData[drp] * livenessCoefficients[count++];
+            if (++drp >= delayLineLength) drp = 0;
         }
         if (++delayWritePosition >= delayLineLength) delayWritePosition = 0;
     }
