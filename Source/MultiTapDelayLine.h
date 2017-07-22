@@ -35,7 +35,7 @@ private:
     int delayWritePosition;
     int delayLineLength;
     double sampleRate;
-    std::list<int> delayReadPositions;
+    std::vector<int> delayReadPositions;
     std::vector<int> multiTapDelayMilliSec;
     std::vector<float> livenessCoefficients;
 };
