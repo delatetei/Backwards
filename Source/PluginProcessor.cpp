@@ -38,6 +38,7 @@ BackwardsAudioProcessor::BackwardsAudioProcessor()
     parameters.createAndAddParameter("mix_bal",  "MIX BAL",  "%",   NormalisableRange<float>(0.0f, 100.0f, 1.0f), 100.0f, valueToTextFunction,  nullptr);
     parameters.createAndAddParameter("thru",     "THRU",     "",    NormalisableRange<float>(0.0f, 1.0f,   1.0f), 0.0f,   valueToOnOffFunction, nullptr);
 
+    parameters.addParameterListener("liveness", new LivenessParameterListener(*this));
     parameters.addParameterListener("delay", new DelayParameterListener(*this));
     parameters.addParameterListener("thru",  new ThruParameterListener(*this));
 
@@ -111,7 +112,8 @@ void BackwardsAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
         delayLine.init(
             sampleRate,
             parameters.getParameterRange("delay").end,
-            *(parameters.getRawParameterValue("delay"))
+            *(parameters.getRawParameterValue("delay")),
+            *(parameters.getRawParameterValue("liveness"))
         );
     }
 }
@@ -232,6 +234,19 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 
 //==============================================================================
 // Inner Class
+BackwardsAudioProcessor::LivenessParameterListener::LivenessParameterListener(BackwardsAudioProcessor & p)
+:_p(p)
+{
+}
+
+void BackwardsAudioProcessor::LivenessParameterListener::parameterChanged(const String & parameterID, float newValue)
+{
+    for (auto& delayLine : _p.multiTapDelayLine)
+    {
+        delayLine.recalculateLivenessCoefficient(newValue);
+    }
+}
+
 BackwardsAudioProcessor::DelayParameterListener::DelayParameterListener(BackwardsAudioProcessor & p)
 :_p(p)
 {
