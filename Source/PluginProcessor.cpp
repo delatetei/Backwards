@@ -38,9 +38,9 @@ BackwardsAudioProcessor::BackwardsAudioProcessor()
     parameters.createAndAddParameter("mix_bal",  "MIX BAL",  "%",   NormalisableRange<float>(0.0f, 100.0f, 1.0f), 100.0f, valueToTextFunction,  nullptr);
     parameters.createAndAddParameter("thru",     "THRU",     "",    NormalisableRange<float>(0.0f, 1.0f,   1.0f), 0.0f,   valueToOnOffFunction, nullptr);
 
-    parameters.addParameterListener("liveness", new LivenessParameterListener(*this));
-    parameters.addParameterListener("delay", new DelayParameterListener(*this));
-    parameters.addParameterListener("thru",  new ThruParameterListener(*this));
+    parameters.addParameterListener("liveness", new ParameterListener(*this));
+    parameters.addParameterListener("delay", new ParameterListener(*this));
+    parameters.addParameterListener("thru", new ParameterListener(*this));
 
     parameters.state = ValueTree(Identifier("Backwards"));
 }
@@ -234,38 +234,33 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 
 //==============================================================================
 // Inner Class
-BackwardsAudioProcessor::LivenessParameterListener::LivenessParameterListener(BackwardsAudioProcessor & p)
+BackwardsAudioProcessor::ParameterListener::ParameterListener(BackwardsAudioProcessor & p)
 :_p(p)
 {
 }
 
-void BackwardsAudioProcessor::LivenessParameterListener::parameterChanged(const String & parameterID, float newValue)
+void BackwardsAudioProcessor::ParameterListener::parameterChanged(const String & parameterID, float newValue)
 {
-    for (auto& delayLine : _p.multiTapDelayLine)
+    if (parameterID == "liveness")
     {
-        delayLine.recalculateLivenessCoefficient(newValue);
+        for (auto& delayLine : _p.multiTapDelayLine)
+        {
+            delayLine.recalculateLivenessCoefficient(newValue);
+        }
     }
-}
-
-BackwardsAudioProcessor::DelayParameterListener::DelayParameterListener(BackwardsAudioProcessor & p)
-:_p(p)
-{
-}
-
-void BackwardsAudioProcessor::DelayParameterListener::parameterChanged(const String & parameterID, float newValue)
-{
-    for (auto& delayLine : _p.multiTapDelayLine)
+    else if (parameterID == "delay")
     {
-        delayLine.recalculateReadPosition(newValue);
+        for (auto& delayLine : _p.multiTapDelayLine)
+        {
+            delayLine.recalculateReadPosition(newValue);
+        }
     }
-}
-
-BackwardsAudioProcessor::ThruParameterListener::ThruParameterListener(BackwardsAudioProcessor & p)
-:_p(p)
-{
-}
-
-void BackwardsAudioProcessor::ThruParameterListener::parameterChanged(const String & parameterID, float newValue)
-{
-    dynamic_cast<BackwardsAudioProcessorEditor*>(_p.editor)->changeLPFSliderState(newValue == 0.0f ? true : false);
+    else if (parameterID == "thru")
+    {
+        dynamic_cast<BackwardsAudioProcessorEditor*>(_p.editor)->changeLPFSliderState(newValue == 0.0f ? true : false);
+    }
+    else
+    {
+        // nothing to do
+    }
 }

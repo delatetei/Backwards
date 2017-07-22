@@ -59,33 +59,15 @@ public:
 
 private:
     //==============================================================================
-    struct LivenessParameterListener : AudioProcessorValueTreeState::Listener
+    struct ParameterListener : AudioProcessorValueTreeState::Listener
     {
     public:
-        LivenessParameterListener(BackwardsAudioProcessor& p);
+        ParameterListener(BackwardsAudioProcessor& p);
         void parameterChanged(const String& parameterID, float newValue) override;
     private:
         BackwardsAudioProcessor& _p;
-
     };
-    struct DelayParameterListener : AudioProcessorValueTreeState::Listener
-    {
-    public:
-        DelayParameterListener(BackwardsAudioProcessor& p);
-        void parameterChanged(const String& parameterID, float newValue) override;
-    private:
-        BackwardsAudioProcessor& _p;
 
-    };
-    struct ThruParameterListener : AudioProcessorValueTreeState::Listener
-    {
-    public:
-        ThruParameterListener(BackwardsAudioProcessor& p);
-        void parameterChanged(const String& parameterID, float newValue) override;
-    private:
-        BackwardsAudioProcessor& _p;
-
-    };
     //==============================================================================
     AudioProcessorEditor* editor;
     AudioProcessorValueTreeState parameters;
