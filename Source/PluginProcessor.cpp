@@ -252,7 +252,7 @@ void BackwardsAudioProcessor::ParameterListener::parameterChanged(const String &
     {
         for (auto& delayLine : _p.multiTapDelayLine)
         {
-            delayLine.updateDelayReadPosition(newValue);
+            delayLine.updateDelayReadPosition(_p.getSampleRate(), newValue);
         }
     }
     else if (parameterID == "thru")

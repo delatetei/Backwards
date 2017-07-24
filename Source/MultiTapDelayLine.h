@@ -18,7 +18,7 @@ public:
 
     void init(double sampleRate, float maxDelayMilliSec, float delayMilliSec, float liveness);
     void processSamples(float* sample, int numSamples);
-    void updateDelayReadPosition(float preDelayMilliSec);
+    void updateDelayReadPosition(double sampleRate, float preDelayMilliSec);
     void updateLivenessCoefficient(float liveness);
 
 private:
@@ -29,7 +29,6 @@ private:
     AudioSampleBuffer delayLine;
     int delayWritePosition;
     int delayLineLength;
-    double sampleRate;
     std::vector<int> delayReadPositions;
     std::vector<int> multiTapDelayMilliSec;
     std::vector<float> livenessCoefficients;

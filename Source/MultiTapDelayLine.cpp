@@ -22,8 +22,7 @@ MultiTapDelayLine::~MultiTapDelayLine()
 
 void MultiTapDelayLine::init(double sampleRate, float maxDelayMilliSec, float preDelayMilliSec, float liveness)
 {
-    this->sampleRate = sampleRate;
-    delayLineLength = static_cast<int>(((multiTapDelayMilliSec.back() + maxDelayMilliSec) / ONE_IN_MILLI) * this->sampleRate);
+    delayLineLength = static_cast<int>(((multiTapDelayMilliSec.back() + maxDelayMilliSec) / ONE_IN_MILLI) * sampleRate);
     if (delayLineLength < 1) delayLineLength = 1;
     delayLine.setSize(1, delayLineLength);
     delayLine.clear();
@@ -31,7 +30,7 @@ void MultiTapDelayLine::init(double sampleRate, float maxDelayMilliSec, float pr
     if (delayReadPositions.empty())
     {
         delayReadPositions.resize(multiTapDelayMilliSec.size());
-        updateDelayReadPosition(preDelayMilliSec);
+        updateDelayReadPosition(sampleRate, preDelayMilliSec);
     }
 
     if (livenessCoefficients.empty())
@@ -59,7 +58,7 @@ void MultiTapDelayLine::processSamples(float* sample, int numSamples)
     }
 }
 
-void MultiTapDelayLine::updateDelayReadPosition(float preDelayMilliSec)
+void MultiTapDelayLine::updateDelayReadPosition(double sampleRate, float preDelayMilliSec)
 {
     const int OFFSET_SAMPLE_NUM = 1;
     for (int i = 0; i < delayReadPositions.size(); ++i)
