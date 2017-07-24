@@ -30,32 +30,14 @@ void MultiTapDelayLine::init(double sampleRate, float maxDelayMilliSec, float pr
 
     if (delayReadPositions.empty())
     {
-        for (auto delayMilliSec : multiTapDelayMilliSec)
-        {
-            delayReadPositions.push_back(calculateReadPosition(delayMilliSec, preDelayMilliSec));
-        }
+        delayReadPositions.resize(multiTapDelayMilliSec.size());
+        updateDelayReadPosition(preDelayMilliSec);
     }
+
     if (livenessCoefficients.empty())
     {
-        for (int i = 1; i <= delayReadPositions.size(); ++i)
-        {
-            livenessCoefficients.push_back(calculateLivenessCoefficient(i, liveness));
-        }
-    }
-}
-
-int MultiTapDelayLine::calculateReadPosition(int delayMilliSec, float preDelayMilliSec)
-{
-    const int OFFSET_SAMPLE_NUM = 1;
-    return (delayWritePosition - static_cast<int>((delayMilliSec + preDelayMilliSec) / ONE_IN_MILLI * sampleRate) + delayLineLength) % delayLineLength + OFFSET_SAMPLE_NUM;
-}
-
-void MultiTapDelayLine::recalculateReadPosition(float preDelayMilliSec)
-{
-    int i = 0;
-    for (auto& drp : delayReadPositions)
-    {
-        drp = calculateReadPosition(multiTapDelayMilliSec[i++], preDelayMilliSec);
+        livenessCoefficients.resize(multiTapDelayMilliSec.size());
+        updateLivenessCoefficient(liveness);
     }
 }
 
@@ -77,16 +59,19 @@ void MultiTapDelayLine::processSamples(float* sample, int numSamples)
     }
 }
 
-float MultiTapDelayLine::calculateLivenessCoefficient(int count, float liveness)
+void MultiTapDelayLine::updateDelayReadPosition(float preDelayMilliSec)
 {
-    return pow(count / float(delayReadPositions.size()), 5.0f - 0.4f * liveness) / 4.0f;
+    const int OFFSET_SAMPLE_NUM = 1;
+    for (int i = 0; i < delayReadPositions.size(); ++i)
+    {
+        delayReadPositions[i] = (delayWritePosition - static_cast<int>((multiTapDelayMilliSec[i] + preDelayMilliSec) / ONE_IN_MILLI * sampleRate) + delayLineLength) % delayLineLength + OFFSET_SAMPLE_NUM;
+    }
 }
 
-void MultiTapDelayLine::recalculateLivenessCoefficient(float liveness)
+void MultiTapDelayLine::updateLivenessCoefficient(float liveness)
 {
-    int i = 0;
-    for (auto& lc : livenessCoefficients)
+    for (int i = 0; i < livenessCoefficients.size(); ++i)
     {
-        lc = calculateLivenessCoefficient(++i, liveness);
+        livenessCoefficients[i] = pow((i + 1) / float(livenessCoefficients.size()), 5.0f - 0.4f * liveness) / 4.0f;
     }
 }

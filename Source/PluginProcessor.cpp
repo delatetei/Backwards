@@ -245,14 +245,14 @@ void BackwardsAudioProcessor::ParameterListener::parameterChanged(const String &
     {
         for (auto& delayLine : _p.multiTapDelayLine)
         {
-            delayLine.recalculateLivenessCoefficient(newValue);
+            delayLine.updateLivenessCoefficient(newValue);
         }
     }
     else if (parameterID == "delay")
     {
         for (auto& delayLine : _p.multiTapDelayLine)
         {
-            delayLine.recalculateReadPosition(newValue);
+            delayLine.updateDelayReadPosition(newValue);
         }
     }
     else if (parameterID == "thru")

@@ -18,15 +18,11 @@ public:
     ~MultiTapDelayLine();
 
     void init(double sampleRate, float maxDelayMilliSec, float delayMilliSec, float liveness);
-    void recalculateReadPosition(float preDelayMilliSec);
-    void recalculateLivenessCoefficient(float liveness);
     void processSamples(float* sample, int numSamples);
+    void updateDelayReadPosition(float preDelayMilliSec);
+    void updateLivenessCoefficient(float liveness);
 
 private:
-    //==============================================================================
-    int calculateReadPosition(int delayMilliSec, float preDelayMilliSec);
-    float calculateLivenessCoefficient(int count, float liveness);
-
     //==============================================================================
     const float ONE_IN_MILLI = 1000.0f;
 
