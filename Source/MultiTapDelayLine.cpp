@@ -20,9 +20,9 @@ MultiTapDelayLine::~MultiTapDelayLine()
 {
 }
 
-void MultiTapDelayLine::init(double sampleRate, float maxDelayMilliSec, float preDelayMilliSec, float liveness)
+void MultiTapDelayLine::init(double sampleRate, float maxDelayMilliSec, float preDelayMilliSec, float maxRoomSize, float roomSize, float liveness)
 {
-    delayLineLength = static_cast<int>(((multiTapDelayMilliSec.back() + maxDelayMilliSec) / ONE_IN_MILLI) * sampleRate);
+    delayLineLength = static_cast<int>(((multiTapDelayMilliSec.back() + (INTERVAL_MILLI_SEC * maxRoomSize * (multiTapDelayMilliSec.size() - 1)) + maxDelayMilliSec) / ONE_IN_MILLI) * sampleRate);
     if (delayLineLength < 1) delayLineLength = 1;
     delayLine.setSize(1, delayLineLength);
     delayLine.clear();
@@ -30,7 +30,7 @@ void MultiTapDelayLine::init(double sampleRate, float maxDelayMilliSec, float pr
     if (delayReadPositions.empty())
     {
         delayReadPositions.resize(multiTapDelayMilliSec.size());
-        updateDelayReadPosition(sampleRate, preDelayMilliSec);
+        updateDelayReadPosition(sampleRate, preDelayMilliSec, roomSize);
     }
 
     if (livenessCoefficients.empty())
@@ -58,12 +58,12 @@ void MultiTapDelayLine::processSamples(float* sample, int numSamples)
     }
 }
 
-void MultiTapDelayLine::updateDelayReadPosition(double sampleRate, float preDelayMilliSec)
+void MultiTapDelayLine::updateDelayReadPosition(double sampleRate, float preDelayMilliSec, float roomSize)
 {
     const int OFFSET_SAMPLE_NUM = 1;
     for (int i = 0; i < delayReadPositions.size(); ++i)
     {
-        delayReadPositions[i] = (delayWritePosition - static_cast<int>((multiTapDelayMilliSec[i] + preDelayMilliSec) / ONE_IN_MILLI * sampleRate) + delayLineLength) % delayLineLength + OFFSET_SAMPLE_NUM;
+        delayReadPositions[i] = (delayWritePosition - static_cast<int>((multiTapDelayMilliSec[i] + (INTERVAL_MILLI_SEC * roomSize * i) + preDelayMilliSec) / ONE_IN_MILLI * sampleRate) + delayLineLength) % delayLineLength + OFFSET_SAMPLE_NUM;
     }
 }
 

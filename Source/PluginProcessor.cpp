@@ -38,6 +38,7 @@ BackwardsAudioProcessor::BackwardsAudioProcessor()
     parameters.createAndAddParameter("mix_bal",  "MIX BAL",  "%",   NormalisableRange<float>(0.0f, 100.0f, 1.0f), 100.0f, valueToTextFunction,  nullptr);
     parameters.createAndAddParameter("thru",     "THRU",     "",    NormalisableRange<float>(0.0f, 1.0f,   1.0f), 0.0f,   valueToOnOffFunction, nullptr);
 
+    parameters.addParameterListener("roomsize", new ParameterListener(*this));
     parameters.addParameterListener("liveness", new ParameterListener(*this));
     parameters.addParameterListener("delay", new ParameterListener(*this));
     parameters.addParameterListener("thru", new ParameterListener(*this));
@@ -113,6 +114,8 @@ void BackwardsAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
             sampleRate,
             parameters.getParameterRange("delay").end,
             *(parameters.getRawParameterValue("delay")),
+            parameters.getParameterRange("roomsize").end,
+            *(parameters.getRawParameterValue("roomsize")),
             *(parameters.getRawParameterValue("liveness"))
         );
     }
@@ -252,7 +255,14 @@ void BackwardsAudioProcessor::ParameterListener::parameterChanged(const String &
     {
         for (auto& delayLine : _p.multiTapDelayLine)
         {
-            delayLine.updateDelayReadPosition(_p.getSampleRate(), newValue);
+            delayLine.updateDelayReadPosition(_p.getSampleRate(), newValue, *(_p.parameters.getRawParameterValue("roomsize")));
+        }
+    }
+    else if (parameterID == "roomsize")
+    {
+        for (auto& delayLine : _p.multiTapDelayLine)
+        {
+            delayLine.updateDelayReadPosition(_p.getSampleRate(), *(_p.parameters.getRawParameterValue("delay")), newValue);
         }
     }
     else if (parameterID == "thru")

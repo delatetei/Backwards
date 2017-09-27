@@ -16,14 +16,15 @@ public:
     MultiTapDelayLine(std::vector<int> multiTapDelayMilliSec);
     ~MultiTapDelayLine();
 
-    void init(double sampleRate, float maxDelayMilliSec, float delayMilliSec, float liveness);
+    void init(double sampleRate, float maxDelayMilliSec, float delayMilliSec, float maxRoomSize, float roomSize, float liveness);
     void processSamples(float* sample, int numSamples);
-    void updateDelayReadPosition(double sampleRate, float preDelayMilliSec);
+    void updateDelayReadPosition(double sampleRate, float preDelayMilliSec, float roomSize);
     void updateLivenessCoefficient(float liveness);
 
 private:
     //==============================================================================
     const float ONE_IN_MILLI = 1000.0f;
+    const float INTERVAL_MILLI_SEC = 30.0f;
 
     //==============================================================================
     AudioSampleBuffer delayLine;
