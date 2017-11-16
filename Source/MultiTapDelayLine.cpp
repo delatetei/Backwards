@@ -7,6 +7,7 @@
 */
 
 #include "MultiTapDelayLine.h"
+#include <algorithm>
 
 MultiTapDelayLine::MultiTapDelayLine(std::vector<int> multiTapDelayMilliSec)
     :
@@ -14,6 +15,7 @@ MultiTapDelayLine::MultiTapDelayLine(std::vector<int> multiTapDelayMilliSec)
     delayWritePosition(0),
     multiTapDelayMilliSec(multiTapDelayMilliSec)
 {
+    std::sort(multiTapDelayMilliSec.begin(), multiTapDelayMilliSec.end());
 }
 
 MultiTapDelayLine::~MultiTapDelayLine()
