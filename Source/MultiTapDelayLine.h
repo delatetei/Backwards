@@ -24,7 +24,7 @@ private:
     void updateLivenessCoefficient();
     //==============================================================================
     const float ONE_IN_MILLI = 1000.0f;
-    const float INTERVAL_MILLI_SEC = 30.0f;
+    const float INTERVAL_MILLI_SEC = 1.0f;
 
     //==============================================================================
     AudioSampleBuffer delayLine;
