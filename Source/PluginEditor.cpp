@@ -16,8 +16,6 @@
 BackwardsAudioProcessorEditor::BackwardsAudioProcessorEditor (BackwardsAudioProcessor& p, AudioProcessorValueTreeState& vts)
     : AudioProcessorEditor (&p), processor (p), valueTreeState(vts)
 {
-    // Make sure that before the constructor has finished, you've set the
-    // editor's size to whatever you need it to be.
     setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 
     title.setFont(Font(40));
@@ -68,7 +66,6 @@ BackwardsAudioProcessorEditor::~BackwardsAudioProcessorEditor()
 //==============================================================================
 void BackwardsAudioProcessorEditor::paint (Graphics& g)
 {
-    // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));
 
     g.setColour(Colours::white);
@@ -79,9 +76,6 @@ void BackwardsAudioProcessorEditor::paint (Graphics& g)
 
 void BackwardsAudioProcessorEditor::resized()
 {
-    // This is generally where you'll want to lay out the positions of any
-    // subcomponents in your editor..
-
     Rectangle<int> area(getLocalBounds());
     Rectangle<int> headerArea(area.removeFromTop(HEADER_HEIGHT));
     Rectangle<int> roomSizeArea(area.removeFromTop(ITEM_HEIGHT));

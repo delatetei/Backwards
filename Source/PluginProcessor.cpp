@@ -105,8 +105,6 @@ void BackwardsAudioProcessor::changeProgramName (int index, const String& newNam
 //==============================================================================
 void BackwardsAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..jj1G
     for (auto& delayLine : multiTapDelayLine)
     {
         delayLine.init(
@@ -154,12 +152,6 @@ void BackwardsAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffe
     const int totalNumInputChannels  = getTotalNumInputChannels();
     const int totalNumOutputChannels = getTotalNumOutputChannels();
 
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
     for (int i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
@@ -172,8 +164,6 @@ void BackwardsAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffe
     AudioSampleBuffer delayBuffer;
     delayBuffer.makeCopyOf(buffer);
 
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
         float* channelData = buffer.getWritePointer(channel);
@@ -192,8 +182,6 @@ void BackwardsAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffe
         }
     }
 
-    // Output Level
-    // [0, 100]  -> [0, 1.0]
     float normalizedOutputValue = *(parameters.getRawParameterValue("out_lvl")) / 100.0f;
     buffer.applyGain(pow(normalizedOutputValue, 2));
 }
