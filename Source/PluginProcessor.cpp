@@ -31,7 +31,6 @@ BackwardsAudioProcessor::BackwardsAudioProcessor()
     auto valueToTextFunction = [](float value) { return String(value); };
     auto valueToOnOffFunction = [](float value) { return value == 0.0f ? "OFF" : "ON"; };
     parameters.createAndAddParameter("roomsize", "ROOMSIZE", "",    NormalisableRange<float>(0.1f, 20.0f,  0.1f), 0.8f,   valueToTextFunction,  nullptr);
-    parameters.createAndAddParameter("liveness", "LIVENESS", "",    NormalisableRange<float>(0.0f, 10.0f,  1.0f), 6.0f,   valueToTextFunction,  nullptr);
     parameters.createAndAddParameter("delay",    "DELAY",    "ms",  NormalisableRange<float>(0.0f, 500.0f, 0.1f), 15.0f,  valueToTextFunction,  nullptr);
     parameters.createAndAddParameter("lpf",      "LPF",      "kHz", NormalisableRange<float>(1.0f, 11.0f,  0.1f), 3.2f,   valueToTextFunction,  nullptr);
     parameters.createAndAddParameter("out_lvl",  "OUT LVL",  "%",   NormalisableRange<float>(0.0f, 100.0f, 1.0f), 80.0f,  valueToTextFunction,  nullptr);
@@ -115,8 +114,7 @@ void BackwardsAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
             parameters.getParameterRange("delay").end,
             *(parameters.getRawParameterValue("delay")),
             parameters.getParameterRange("roomsize").end,
-            *(parameters.getRawParameterValue("roomsize")),
-            *(parameters.getRawParameterValue("liveness"))
+            *(parameters.getRawParameterValue("roomsize"))
         );
     }
 }
@@ -244,14 +242,7 @@ BackwardsAudioProcessor::ParameterListener::ParameterListener(BackwardsAudioProc
 
 void BackwardsAudioProcessor::ParameterListener::parameterChanged(const String & parameterID, float newValue)
 {
-    if (parameterID == "liveness")
-    {
-        for (auto& delayLine : _p.multiTapDelayLine)
-        {
-            delayLine.updateLivenessCoefficient(newValue);
-        }
-    }
-    else if (parameterID == "delay")
+    if (parameterID == "delay")
     {
         for (auto& delayLine : _p.multiTapDelayLine)
         {

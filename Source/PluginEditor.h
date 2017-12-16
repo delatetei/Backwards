@@ -38,7 +38,7 @@ private:
     AudioProcessorValueTreeState& valueTreeState;
 
     //==============================================================================
-    const int WINDOW_HEIGHT = 200;
+    const int WINDOW_HEIGHT = 176;
     const int WINDOW_WIDTH = 400;
     const int HEADER_HEIGHT = 50;
     const int ITEM_HEIGHT= 24;
@@ -50,14 +50,12 @@ private:
 
     //==============================================================================
     Slider roomSize;
-    Slider liveness;
     Slider delay;
     Slider lowpassFilter;
     Slider outputLevel;
     Slider mixBalance;
     ToggleButton thru;
     Label roomSizeLabel;
-    Label livenessLabel;
     Label delayLabel;
     Label lowpassFilterLabel;
     Label outputLevelLabel;
@@ -65,7 +63,6 @@ private:
 
     //==============================================================================
     ScopedPointer<AudioProcessorValueTreeState::SliderAttachment> roomSizeAttachment;
-    ScopedPointer<AudioProcessorValueTreeState::SliderAttachment> livenessAttachment;
     ScopedPointer<AudioProcessorValueTreeState::SliderAttachment> delayAttachment;
     ScopedPointer<AudioProcessorValueTreeState::SliderAttachment> lowpassFilterAttachment;
     ScopedPointer<AudioProcessorValueTreeState::SliderAttachment> outputLevelAttachment;
