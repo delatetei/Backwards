@@ -62,10 +62,9 @@ void MultiTapDelayLine::processSamples(float* sample, int numSamples)
 
 void MultiTapDelayLine::updateDelayReadPosition(double sampleRate, float preDelayMilliSec, float roomSize)
 {
-    const int OFFSET_SAMPLE_NUM = 1;
     for (int i = 0; i < delayReadPositions.size(); ++i)
     {
-        delayReadPositions[i] = (delayWritePosition - static_cast<int>((multiTapDelayMilliSec[i] + (INTERVAL_MILLI_SEC * roomSize * i) + preDelayMilliSec) / ONE_IN_MILLI * sampleRate) + delayLineLength) % delayLineLength + OFFSET_SAMPLE_NUM;
+        delayReadPositions[i] = (delayWritePosition - static_cast<int>((multiTapDelayMilliSec[i] + (INTERVAL_MILLI_SEC * roomSize * i) + preDelayMilliSec) / ONE_IN_MILLI * sampleRate) + delayLineLength) % delayLineLength;
     }
 }
 
