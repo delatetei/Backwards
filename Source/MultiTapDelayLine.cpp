@@ -73,6 +73,6 @@ void MultiTapDelayLine::updateLivenessCoefficient()
 {
     for (int i = 0; i < livenessCoefficients.size(); ++i)
     {
-       livenessCoefficients[i] = 0.01f * (i + 1);
+       livenessCoefficients[i] = 0.02f * (i + 1);
     }
 }
