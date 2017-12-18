@@ -29,17 +29,11 @@ void MultiTapDelayLine::init(double sampleRate, float maxDelayMilliSec, float pr
     delayLine.setSize(1, delayLineLength);
     delayLine.clear();
 
-    if (delayReadPositions.empty())
-    {
-        delayReadPositions.resize(multiTapDelayMilliSec.size());
-        updateDelayReadPosition(sampleRate, preDelayMilliSec, roomSize);
-    }
+    delayReadPositions.resize(multiTapDelayMilliSec.size());
+    updateDelayReadPosition(sampleRate, preDelayMilliSec, roomSize);
 
-    if (livenessCoefficients.empty())
-    {
-        livenessCoefficients.resize(multiTapDelayMilliSec.size());
-        updateLivenessCoefficient();
-    }
+    livenessCoefficients.resize(multiTapDelayMilliSec.size());
+    updateLivenessCoefficient();
 }
 
 void MultiTapDelayLine::processSamples(float* sample, int numSamples)
